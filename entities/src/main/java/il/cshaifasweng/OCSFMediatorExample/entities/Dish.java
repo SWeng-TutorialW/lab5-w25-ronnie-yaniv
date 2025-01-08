@@ -1,6 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.entities;
 // probably use several maps:
-// map dish  id to name and price,
+// map dish id to name and price,
 // map dish id to ingredients
 // map dish id to personal preferences
 
@@ -25,7 +25,5 @@ public class Dish {
     @JoinTable(name="DishesIngredients")
     public List<Ingredient> ingredients;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name="DishesPersonalPreferences")
-    public List<PersonalPreference> preferences;
+    public PersonalPreference preferences;
 }

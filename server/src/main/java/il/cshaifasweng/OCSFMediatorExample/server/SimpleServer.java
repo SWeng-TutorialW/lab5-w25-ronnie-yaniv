@@ -1,12 +1,12 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.CompactMenu;
 import il.cshaifasweng.OCSFMediatorExample.entities.Dish;
-import il.cshaifasweng.OCSFMediatorExample.entities.Menu;
+import il.cshaifasweng.OCSFMediatorExample.entities.MenuUpdateEvent;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.ConnectionToClient;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
 
 
@@ -17,10 +17,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.service.ServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
 
 public class SimpleServer extends AbstractServer {
 
@@ -85,17 +82,16 @@ public class SimpleServer extends AbstractServer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} else if (msg instanceof Menu) {
+		} else if (msg instanceof Dish) {
+			var dish = (Dish) msg;
 			session.beginTransaction();
-			for (var dish : ((Menu) msg).dishes) {
-				session.merge(dish);
-			}
+			session.merge(dish);
 			session.getTransaction().commit();
-			sendToAllClients(msg);
+			sendToAllClients(new MenuUpdateEvent(dish));
 		}
 	}
 
-	private static List<String> getDishNames() {
+	private static CompactMenu getDishNames() {
 		session.beginTransaction();
 		var builder = session.getCriteriaBuilder();
 		var query = builder.createQuery(String.class);
@@ -103,7 +99,7 @@ public class SimpleServer extends AbstractServer {
 		query.select(root.get("name"));
 		var dishNames = session.createQuery(query).getResultList();
 		session.getTransaction().commit();
-		return dishNames;
+		return new CompactMenu(dishNames);
 	}
 
 	private static Dish getDish(String dishName) {
