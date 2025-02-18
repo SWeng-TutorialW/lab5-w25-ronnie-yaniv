@@ -63,7 +63,9 @@ public class SimpleClient extends AbstractClient {
 
 	public static synchronized SimpleClient getClient() {
 		if (client == null) {
-			client = new SimpleClient("192.168.62.248", 3000);
+			System.out.println("Enter host address: ");
+			String host = new java.util.Scanner(System.in).nextLine();
+			client = new SimpleClient(host, 3000);
 		}
 		return client;
 	}
